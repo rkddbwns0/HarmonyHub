@@ -1,0 +1,54 @@
+.container {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+}
+
+.mainContainer {
+    justify-content: center;
+    justify-items: center;
+    align-items: center;
+}
+
+.boardTable {
+    width: 90%;
+    margin: 5%;
+    border-collapse: collapse;
+}
+
+.board-thead {
+    justify-items: center;
+    justify-content: center;
+    align-items: center;
+    border-top: 1px solid black;
+    border-bottom: 1px solid black;
+}
+
+.board-th,
+.board-td {
+    text-align: center;
+    padding: 1%;
+}
+
+.board-td {
+    border-bottom: thin solid #b3b3b3;
+}
+
+.titleName {
+    width: 50%;
+}
+
+.titleText {
+    text-align: left;
+    border-bottom: thin solid #b3b3b3;
+}
+
+.board-tbody {
+    justify-items: center;
+    justify-content: center;
+    align-items: center;
+}
+
+.no {
+    width: 10%;
+}

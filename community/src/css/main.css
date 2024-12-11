@@ -1,0 +1,48 @@
+.popular-view {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    padding: 1%;
+}
+
+.tableContainer {
+    display: flex;
+    justify-content: space-between;
+}
+
+.main-table-view {
+    flex: 1;
+    border-radius: 10px;
+    overflow: hidden;
+    border: thin solid #b2b2b2;
+    padding: 10px;
+}
+
+.main-table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.main-thead {
+    justify-items: center;
+    justify-content: center;
+    align-items: center;
+}
+
+.main-tbody {
+    justify-items: center;
+    justify-content: center;
+    align-items: center;
+}
+
+.main-tr {
+    align-items: center;
+    justify-items: center;
+}
+
+.main-td,
+.main-th {
+    font-size: 14px;
+    text-align: center;
+    padding: 10px;
+}
