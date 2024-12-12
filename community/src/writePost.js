@@ -22,7 +22,7 @@ function WritePost() {
             } else {
                 const response = await axios.post(
                     `${SERVER_ADDRESS}/postdb/insert`,
-                    { category_no: category_no, title: title, content: content, writer: user.nickname },
+                    { category_no: category_no, title: title, content: content, writer: user[0]?.nickname },
                     {
                         withCredentials: true,
                     }
@@ -55,7 +55,7 @@ function WritePost() {
                 </div>
                 <div>
                     <p>작성자</p>
-                    {user ? <p>{user.nickname}</p> : null}
+                    {user ? <p>{user[0]?.nickname}</p> : null}
                 </div>
                 <div>
                     <textarea

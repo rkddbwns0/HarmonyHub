@@ -1,9 +1,9 @@
 const express = require('express');
 const db = require('../dbconnection');
-const session = require('express-session');
 const router = express.Router();
 require('dotenv').config();
 const jwt = require('jsonwebtoken');
+const checkToken = require('./jwtToken');
 
 let token = {};
 
@@ -81,22 +81,6 @@ router.post('/login', (req, res) => {
         }
     });
 });
-
-const checkToken = (req, res, next) => {
-    const access_token = req.cookies.accessToken;
-
-    if (access_token) {
-        try {
-            const decoded = jwt.verify(access_token, process.env.JWT_SECRET_KET);
-            req.user = decoded;
-            next();
-        } catch (error) {
-            console.error(error);
-        }
-    } else {
-        console.log('토큰 없어용');
-    }
-};
 
 router.post('/user', checkToken, async (req, res) => {
     const userId = req.user.id;

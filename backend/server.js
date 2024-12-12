@@ -10,6 +10,7 @@ const comments = require('./Routes/comments');
 const melon = require('./Routes/melon');
 const genie = require('./Routes/genie');
 const bugs = require('./Routes/bugs');
+const router = require('./Routes/melon');
 require('dotenv').config();
 
 const app = express();

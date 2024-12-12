@@ -4,6 +4,7 @@ import useFetchUser from './useFetchUser';
 import axios from 'axios';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { SERVER_ADDRESS } from './serverAddress/serverAddress';
+import './css/viewBoard.css';
 
 function ViewBoard() {
     const { user } = useFetchUser();
@@ -17,6 +18,7 @@ function ViewBoard() {
     const [reply, setReply] = useState('');
     const [parentId, setParentId] = useState(null);
     const [commentsLog, setCommentsLog] = useState([]);
+    const [showComments, setShowComments] = useState(false);
 
     const formatEmail = (data) => {
         const [localPart, domain] = data.split('@');
@@ -97,25 +99,29 @@ function ViewBoard() {
 
     const insertComments = async () => {
         if (user) {
-            try {
-                const response = await axios.post(
-                    `${SERVER_ADDRESS}/comments/insert`,
-                    {
-                        board_no: no,
-                        category_no: category_no,
-                        nickname: user.nickname,
-                        comment: comments,
-                        parent_id: parentId,
-                    },
-                    { withCredentials: true }
-                );
-                alert('댓글이 입력되었습니다!');
-            } catch (error) {
-                console.error(error);
-            } finally {
-                setComments('');
-                setParentId(null);
-                commentsData();
+            if (comments === '') {
+                alert('댓글을 입력해 주세요.');
+            } else {
+                try {
+                    const response = await axios.post(
+                        `${SERVER_ADDRESS}/comments/insert`,
+                        {
+                            board_no: no,
+                            category_no: category_no,
+                            nickname: user[0]?.nickname,
+                            comment: comments,
+                            parent_id: parentId,
+                        },
+                        { withCredentials: true }
+                    );
+                    alert('댓글이 입력되었습니다!');
+                } catch (error) {
+                    console.error(error);
+                } finally {
+                    setComments('');
+                    setParentId(null);
+                    commentsData();
+                }
             }
         } else {
             alert('로그인을 해주세요.');
@@ -125,47 +131,57 @@ function ViewBoard() {
     };
 
     const handleReply = (parent_id) => {
+        setShowComments(true);
         setParentId(parent_id);
         setComments('');
     };
 
     return (
-        <div>
+        <div className="container">
             <div>
                 <Nav user={user} />
             </div>
-            <div>
+            <div className="mainView">
                 <div>
-                    <p>{view.title}</p>
-                </div>
-                <div>
-                    <p>{view.writer}</p>
-                </div>
-                <div>
-                    <p>{view.content}</p>
-                </div>
-                <div>
-                    <p>{view.regDate}</p>
-                </div>
-                <div>
-                    <p>{view.hits}</p>
-                </div>
-                <div>
-                    <p>{view.liked}</p>
-                    <button onClick={liked}>{user && isLiked ? '좋아요 취소' : '좋아요'}</button>
+                    <div>
+                        <p>{view.title}</p>
+                    </div>
+                    <div>
+                        <p>{view.writer}</p>
+                    </div>
+                    <div>
+                        <p>{view.content}</p>
+                    </div>
+                    <div>
+                        <p>{view.regDate}</p>
+                    </div>
+                    <div>
+                        <p>{view.hits}</p>
+                    </div>
+                    <div>
+                        <p>{view.liked}</p>
+                        <button onClick={liked}>{user && isLiked ? '좋아요 취소' : '좋아요'}</button>
+                    </div>
                 </div>
 
                 <div className="commentsView">
                     <div>
                         <p>댓글</p>
-                        <textarea
-                            className="comment-input"
-                            maxLength={20}
-                            placeholder="내용을 입력해 주세요."
-                            value={comments}
-                            onChange={(e) => setComments(e.target.value)}
-                        />
-                        <button onClick={insertComments}>등록</button>
+                        <div className="regCommentView">
+                            <div className="textareaView">
+                                <textarea
+                                    className="comment-input"
+                                    maxLength={500}
+                                    placeholder="내용을 입력해 주세요."
+                                    value={comments}
+                                    onChange={(e) => setComments(e.target.value)}
+                                />
+                                <p className="comments_length">{comments.length} / 500</p>
+                                <button onClick={insertComments} className="comment-btn">
+                                    등록
+                                </button>
+                            </div>
+                        </div>
                     </div>
                     {commentsLog.length > 0 ? (
                         <div>
@@ -175,11 +191,14 @@ function ViewBoard() {
                                         {item.nickname}({formatEmail(item.user_id)})
                                     </p>
                                     <p>{item.comment}</p>
-                                    <textarea
-                                        placeholder="답글을 입력하세요."
-                                        value={comments}
-                                        onChange={(e) => setComments(e.target.value)}
-                                    />
+                                    {showComments === true ? (
+                                        <textarea
+                                            placeholder="답글을 입력하세요."
+                                            value={comments}
+                                            onChange={(e) => setComments(e.target.value)}
+                                        />
+                                    ) : null}
+
                                     <p
                                         onClick={() => {
                                             handleReply(item.no);

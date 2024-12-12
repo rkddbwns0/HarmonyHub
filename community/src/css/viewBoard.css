@@ -1,0 +1,51 @@
+.container {
+    display: flex;
+    flex: 1;
+}
+
+.mainView {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+}
+
+.regCommentView {
+    display: flex;
+    flex-direction: column;
+}
+
+textarea,
+textarea:focus {
+    outline: none !important;
+    box-shadow: none !important;
+    resize: none;
+}
+
+.textareaView {
+    display: flex;
+    align-items: stretch;
+    justify-content: center;
+    border: 1px solid black;
+    height: 100px;
+}
+
+.comment-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    height: auto;
+    padding: 10px;
+}
+
+.comments_length {
+    font-size: 13px;
+    margin-right: 10px;
+    margin-top: 4%;
+}
+
+.comment-btn {
+    height: 100%;
+    width: 120px;
+    border: none;
+    border-left: 1px solid black;
+}

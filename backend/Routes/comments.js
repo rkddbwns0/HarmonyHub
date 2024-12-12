@@ -1,5 +1,6 @@
 const express = require('express');
 const db = require('../dbconnection');
+const checkToken = require('./jwtToken');
 const router = express.Router();
 
 function insertComment(board_no, category_no, user_id, nickname, comment, parent_id, group_order, depth, res) {
@@ -34,13 +35,13 @@ router.get('/select/:board_no/:category_no', (req, res) => {
     });
 });
 
-router.post('/insert', (req, res) => {
-    if (!req.session.user || !req.session.user.id) {
+router.post('/insert', checkToken, (req, res) => {
+    if (!req.user.id) {
         return res.json({ mesaage: '로그인 한 회원만 사용가능합니다.' });
     }
 
     const { board_no, category_no, nickname, comment, parent_id = null } = req.body;
-    const userId = req.session.user.id;
+    const userId = req.user.id;
 
     if (parent_id) {
         const query = 'SELECT group_order, depth FROM comments WHERE no = ?';

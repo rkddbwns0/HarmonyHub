@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './css/topBar.css';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { replace, useLocation, useNavigate } from 'react-router-dom';
 import { SERVER_ADDRESS } from './serverAddress/serverAddress';
 
 function Nav({ user }) {
@@ -29,6 +29,7 @@ function Nav({ user }) {
                 },
                 { withCredentials: true }
             );
+            console.log(response.data);
         } catch (error) {
             console.error(error);
         }
@@ -71,9 +72,7 @@ function Nav({ user }) {
                             )}
                         </div>
 
-                        <a className="top-nav-text" href="/">
-                            공지사항
-                        </a>
+                        <a className="top-nav-text">공지사항</a>
                     </div>
                 </div>
                 <div className="top-bar">

@@ -1,28 +1,27 @@
 const express = require('express');
 const db = require('../dbconnection');
+const checkToken = require('./jwtToken');
 const router = express.Router();
 
 const postViewTimeStamp = new Map();
 
-router.post('/insert', (req, res) => {
-    if (req.session.user && req.session.user.id) {
-        const { category_no, writer, title, content, image } = req.body;
-        const userId = req.session.user.id;
-        const regDate = new Date();
-        const kstOffset = 9 * 60;
-        const kstDate = new Date(regDate.getTime() + kstOffset * 60 * 1000);
-        const dateString = kstDate.toISOString();
-        const formatDate = dateString.slice(0, 19);
+router.post('/insert', checkToken, (req, res) => {
+    const { category_no, writer, title, content, image } = req.body;
+    const userId = req.user.id;
+    const regDate = new Date();
+    const kstOffset = 9 * 60;
+    const kstDate = new Date(regDate.getTime() + kstOffset * 60 * 1000);
+    const dateString = kstDate.toISOString();
+    const formatDate = dateString.slice(0, 19);
 
-        const query =
-            'INSERT INTO postdb (user_id, category_no, writer, title, content, image, regDate) VALUES (?, ?, ?, ?, ?, ?, ?)';
-        db.query(query, [userId, category_no, writer, title, content, image, formatDate], (error, result) => {
-            if (error) {
-                console.error(error);
-            }
-            res.json({ success: true });
-        });
-    }
+    const query =
+        'INSERT INTO postdb (user_id, category_no, writer, title, content, image, regDate) VALUES (?, ?, ?, ?, ?, ?, ?)';
+    db.query(query, [userId, category_no, writer, title, content, image, formatDate], (error, result) => {
+        if (error) {
+            console.error(error);
+        }
+        res.json({ success: true });
+    });
 });
 
 router.get('/select', (req, res) => {
@@ -83,75 +82,66 @@ router.get('/view', (req, res) => {
     });
 });
 
-router.post('/checkLiked', async (req, res) => {
-    if (req.session.user && req.session.user.id) {
-        const userId = req.session.user.id;
-        const { post_no, category_no } = req.body;
+router.post('/checkLiked', checkToken, async (req, res) => {
+    const userId = req.user.id;
+    const { post_no, category_no } = req.body;
 
-        try {
-            const [result] = await db
-                .promise()
-                .query('SELECT * FROM check_liked WHERE user_id = ? AND post_no = ? AND category_no = ?', [
-                    userId,
-                    post_no,
-                    category_no,
-                ]);
-            if (result.length > 0) {
-                res.json({ liked: true });
-            } else {
-                res.json({ liked: false });
-            }
-        } catch (error) {
-            console.error(error);
+    try {
+        const [result] = await db
+            .promise()
+            .query('SELECT * FROM check_liked WHERE user_id = ? AND post_no = ? AND category_no = ?', [
+                userId,
+                post_no,
+                category_no,
+            ]);
+        if (result.length > 0) {
+            res.json({ liked: true });
+        } else {
+            res.json({ liked: false });
         }
-    } else {
-        res.status(401).json({ error: 'error' });
+    } catch (error) {
+        console.error(error);
     }
 });
 
-router.post('/liked', async (req, res) => {
-    if (req.session.user && req.session.user.id) {
-        const userId = req.session.user.id;
-        const { post_no, category_no } = req.body;
-        try {
-            const [result] = await db
+router.post('/liked', checkToken, async (req, res) => {
+    const userId = req.user.id;
+    const { post_no, category_no } = req.body;
+    try {
+        const [result] = await db
+            .promise()
+            .query('SELECT liked FROM check_liked WHERE user_id = ? AND post_no = ? AND category_no = ?', [
+                userId,
+                post_no,
+                category_no,
+            ]);
+        if (result.length === 0) {
+            await db
                 .promise()
-                .query('SELECT liked FROM check_liked WHERE user_id = ? AND post_no = ? AND category_no = ?', [
+                .query(`INSERT INTO check_liked (user_id, post_no, category_no, liked) VALUES (?, ?, ?, 'yes')`, [
                     userId,
                     post_no,
                     category_no,
                 ]);
-            if (result.length === 0) {
-                await db
-                    .promise()
-                    .query(`INSERT INTO check_liked (user_id, post_no, category_no, liked) VALUES (?, ?, ?, 'yes')`, [
-                        userId,
-                        post_no,
-                        category_no,
-                    ]);
-                await db
-                    .promise()
-                    .query(`UPDATE postdb SET liked = liked + 1 WHERE no = ? AND category_no`, [post_no, category_no]);
-                res.json({ success: true });
-            } else {
-                await db
-                    .promise()
-                    .query(`DELETE FROM check_liked WHERE user_id = ? AND post_no = ? AND category_no = ?`, [
-                        userId,
-                        post_no,
-                        category_no,
-                    ]);
-                await db
-                    .promise()
-                    .query(`UPDATE postdb SET liked = liked - 1 WHERE no = ? AND category_no = ?`, [
-                        post_no,
-                        category_no,
-                    ]);
-                res.json({ success: true });
-            }
-        } catch (error) {
-            console.error(error);
+            await db
+                .promise()
+                .query(`UPDATE postdb SET liked = liked + 1 WHERE no = ? AND category_no`, [post_no, category_no]);
+            res.json({ success: true });
+        } else {
+            await db
+                .promise()
+                .query(`DELETE FROM check_liked WHERE user_id = ? AND post_no = ? AND category_no = ?`, [
+                    userId,
+                    post_no,
+                    category_no,
+                ]);
+            await db
+                .promise()
+                .query(`UPDATE postdb SET liked = liked - 1 WHERE no = ? AND category_no = ?`, [post_no, category_no]);
+            res.json({ success: true });
         }
+    } catch (error) {
+        console.error(error);
     }
 });
 
