@@ -49,3 +49,16 @@ textarea:focus {
     border: none;
     border-left: 1px solid black;
 }
+
+.reCommentsContainer {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    margin-top: 10px;
+}
+
+.reCommentsView {
+    border: thin solid black;
+    border-radius: 10px;
+    padding: 5px;
+}

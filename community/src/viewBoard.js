@@ -15,6 +15,7 @@ function ViewBoard() {
     const [view, setView] = useState([]);
     const [isLiked, setIsLiked] = useState(false);
     const [comments, setComments] = useState('');
+    const [reComments, setReComments] = useState('');
     const [reply, setReply] = useState('');
     const [parentId, setParentId] = useState(null);
     const [commentsLog, setCommentsLog] = useState([]);
@@ -99,7 +100,7 @@ function ViewBoard() {
 
     const insertComments = async () => {
         if (user) {
-            if (comments === '') {
+            if (comments === '' && reComments === '') {
                 alert('댓글을 입력해 주세요.');
             } else {
                 try {
@@ -109,18 +110,19 @@ function ViewBoard() {
                             board_no: no,
                             category_no: category_no,
                             nickname: user[0]?.nickname,
-                            comment: comments,
-                            parent_id: parentId,
+                            comment: parentId ? reComments : comments,
+                            parent_id: parentId || null,
                         },
                         { withCredentials: true }
                     );
+                    setComments('');
+                    setReComments('');
+                    setParentId(null);
+                    setShowComments(!showComments);
+                    commentsData();
                     alert('댓글이 입력되었습니다!');
                 } catch (error) {
                     console.error(error);
-                } finally {
-                    setComments('');
-                    setParentId(null);
-                    commentsData();
                 }
             }
         } else {
@@ -131,7 +133,7 @@ function ViewBoard() {
     };
 
     const handleReply = (parent_id) => {
-        setShowComments(true);
+        setShowComments(!showComments);
         setParentId(parent_id);
         setComments('');
     };
@@ -184,19 +186,24 @@ function ViewBoard() {
                         </div>
                     </div>
                     {commentsLog.length > 0 ? (
-                        <div>
+                        <div className="reCommentsContainer">
                             {commentsLog.map((item, index) => (
-                                <div key={index}>
+                                <div key={index} className="reCommentsView">
                                     <p>
                                         {item.nickname}({formatEmail(item.user_id)})
                                     </p>
                                     <p>{item.comment}</p>
-                                    {showComments === true ? (
-                                        <textarea
-                                            placeholder="답글을 입력하세요."
-                                            value={comments}
-                                            onChange={(e) => setComments(e.target.value)}
-                                        />
+                                    {parentId === item.no ? (
+                                        <div>
+                                            <textarea
+                                                placeholder="답글을 입력하세요."
+                                                value={reComments}
+                                                onChange={(e) => setReComments(e.target.value)}
+                                            />
+                                            <button onClick={insertComments} className="comment-btn">
+                                                등록
+                                            </button>
+                                        </div>
                                     ) : null}
 
                                     <p
