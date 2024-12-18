@@ -8,7 +8,10 @@ import Board from './board';
 import ViewBoard from './viewBoard';
 import Category_posts from './category_posts';
 import { PostProvider } from './context/postContext';
-import Chart from './chart';
+import MyPosts from './myPosts';
+import MyPage from './myPage';
+import MyComments from './myComments';
+import ModifyUser from './modifyUser';
 
 function App() {
     return (
@@ -23,7 +26,10 @@ function App() {
                     <Route path="/board" Component={Board} />
                     <Route path="/viewBoard" Component={ViewBoard} />
                     <Route path="/category_posts" Component={Category_posts} />
-                    <Route path="/chart" Component={Chart} />
+                    <Route path="/myPage" Component={MyPage} />
+                    <Route path="/myPosts" Component={MyPosts} />
+                    <Route path="/myComments" Component={MyComments} />
+                    <Route path="/modifyUser" Component={ModifyUser} />
                 </Routes>
             </Router>
         </PostProvider>

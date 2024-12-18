@@ -22,14 +22,9 @@ function Nav({ user }) {
 
     const logout = async () => {
         try {
-            const response = await axios.post(
-                'http://localhost:8080/userdb/logout',
-                {
-                    id: user[0]?.id,
-                },
-                { withCredentials: true }
-            );
+            const response = await axios.post('http://localhost:8080/userdb/logout', {}, { withCredentials: true });
             console.log(response.data);
+            window.location.reload();
         } catch (error) {
             console.error(error);
         }
@@ -78,10 +73,8 @@ function Nav({ user }) {
                 <div className="top-bar">
                     {user ? (
                         <div className="loginView">
-                            <a onClick={logout} href="/">
-                                로그아웃
-                            </a>
-                            <a>마이페이지</a>
+                            <a onClick={logout}>로그아웃</a>
+                            <a href="/myPage">마이페이지</a>
                             <a>{user[0]?.nickname}님</a>
                         </div>
                     ) : (

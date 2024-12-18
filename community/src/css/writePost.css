@@ -1,0 +1,30 @@
+.topView {
+    display: flex;
+    flex: 1;
+    width: 1000px;
+    flex-direction: row;
+    justify-content: space-around;
+}
+
+.titleView {
+    width: 500px;
+}
+
+.titleInput {
+    width: 500px;
+    padding: 10px;
+}
+
+.categoryView,
+.writerView {
+    display: flex;
+    flex: 1;
+    flex-direction: row;
+    justify-content: space-evenly;
+}
+
+.contentInput {
+    padding: 8px;
+    width: 1000px;
+    height: 500px;
+}

@@ -4,20 +4,37 @@ const checkToken = require('./jwtToken');
 const router = express.Router();
 
 function insertComment(board_no, category_no, user_id, nickname, comment, parent_id, group_order, depth, res) {
-    const insertQuery = `
+    if (category_no === 2) {
+        const insertQuery = `
+        INSERT INTO comments (board_no, category_no, user_id, nickname, comment, parent_id, group_order, depth, regDate)
+        VALUES (?, ?, ?, '익명', ?, ?, ?, ?, NOW());
+    `;
+        db.query(
+            insertQuery,
+            [board_no, category_no, user_id, comment, parent_id, group_order, depth],
+            (error, result) => {
+                if (error) {
+                    console.error(error);
+                    return res.status(400).json({ message: '에러임' });
+                }
+            }
+        );
+    } else {
+        const insertQuery = `
         INSERT INTO comments (board_no, category_no, user_id, nickname, comment, parent_id, group_order, depth, regDate)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW());
     `;
-    db.query(
-        insertQuery,
-        [board_no, category_no, user_id, nickname, comment, parent_id, group_order, depth],
-        (error, result) => {
-            if (error) {
-                console.error(error);
-                return res.status(400).json({ message: '에러임' });
+        db.query(
+            insertQuery,
+            [board_no, category_no, user_id, nickname, comment, parent_id, group_order, depth],
+            (error, result) => {
+                if (error) {
+                    console.error(error);
+                    return res.status(400).json({ message: '에러임' });
+                }
             }
-        }
-    );
+        );
+    }
 }
 
 router.get('/select/:board_no/:category_no', (req, res) => {
@@ -69,6 +86,27 @@ router.post('/insert', checkToken, (req, res) => {
             insertComment(board_no, category_no, userId, nickname, comment, null, group_order, depth, res);
         });
     }
+});
+
+router.post('/myComments', checkToken, (req, res) => {
+    const userId = req.user.id;
+
+    const query = `
+    SELECT comments.nickname, comments.comment, comments.liked, comments.regDate, posts_category.category, postdb.title
+    FROM comments
+    JOIN posts_category ON comments.category_no = posts_category.no
+    JOIN postdb ON comments.board_no = postdb.no
+    WHERE comments.user_id = ?
+    ORDER BY regDate DESC
+    `;
+
+    db.query(query, [userId], (error, result) => {
+        if (error) {
+            console.error(error);
+        }
+
+        res.json(result);
+    });
 });
 
 module.exports = router;

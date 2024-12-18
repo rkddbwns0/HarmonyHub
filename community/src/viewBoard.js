@@ -115,9 +115,9 @@ function ViewBoard() {
                         },
                         { withCredentials: true }
                     );
+                    setParentId(null);
                     setComments('');
                     setReComments('');
-                    setParentId(null);
                     setShowComments(!showComments);
                     commentsData();
                     alert('댓글이 입력되었습니다!');
@@ -189,9 +189,13 @@ function ViewBoard() {
                         <div className="reCommentsContainer">
                             {commentsLog.map((item, index) => (
                                 <div key={index} className="reCommentsView">
-                                    <p>
-                                        {item.nickname}({formatEmail(item.user_id)})
-                                    </p>
+                                    {category_no === 2 ? (
+                                        <p>{item.nickname}</p>
+                                    ) : (
+                                        <p>
+                                            {item.nickname}({formatEmail(item.user_id)})
+                                        </p>
+                                    )}
                                     <p>{item.comment}</p>
                                     {parentId === item.no ? (
                                         <div>

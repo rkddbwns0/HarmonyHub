@@ -14,14 +14,25 @@ router.post('/insert', checkToken, (req, res) => {
     const dateString = kstDate.toISOString();
     const formatDate = dateString.slice(0, 19);
 
-    const query =
-        'INSERT INTO postdb (user_id, category_no, writer, title, content, image, regDate) VALUES (?, ?, ?, ?, ?, ?, ?)';
-    db.query(query, [userId, category_no, writer, title, content, image, formatDate], (error, result) => {
-        if (error) {
-            console.error(error);
-        }
-        res.json({ success: true });
-    });
+    if (category_no === 2) {
+        const anonQuery = `INSERT INTO postdb (user_id, category_no, writer, title, content, image, regDate) VALUES (?, ?, '익명', ?, ?, ?, ?)`;
+        db.query(anonQuery, [userId, category_no, title, content, image, formatDate], (error, anonResult) => {
+            if (error) {
+                console.error(error);
+            }
+
+            res.json({ success: true });
+        });
+    } else {
+        const query =
+            'INSERT INTO postdb (user_id, category_no, writer, title, content, image, regDate) VALUES (?, ?, ?, ?, ?, ?, ?)';
+        db.query(query, [userId, category_no, writer, title, content, image, formatDate], (error, result) => {
+            if (error) {
+                console.error(error);
+            }
+            res.json({ success: true });
+        });
+    }
 });
 
 router.get('/select', (req, res) => {
@@ -173,6 +184,26 @@ router.get('/popular_liked', (req, res) => {
         if (error) {
             console.error(error);
         }
+        res.json(result);
+    });
+});
+
+router.post('/myPosts', checkToken, (req, res) => {
+    const userId = req.user.id;
+
+    const query = `
+    SELECT postdb.writer, postdb.title, postdb.content, postdb.image, postdb.regDate, postdb.hits, postdb.liked, posts_category.category 
+    FROM postdb
+    JOIN posts_category ON postdb.category_no = posts_category.no
+    WHERE user_id = ?
+    ORDER BY postdb.regDate DESC
+    `;
+
+    db.query(query, [userId], (error, result) => {
+        if (error) {
+            console.error(error);
+        }
+
         res.json(result);
     });
 });

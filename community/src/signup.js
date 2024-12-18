@@ -79,7 +79,7 @@ function Signup() {
         if (!validPhone(phone)) return;
 
         try {
-            const response = await axios.post('/userdb/checkUser', { phone: phone });
+            const response = await axios.post(`${SERVER_ADDRESS}/userdb/checkUser`, { phone: phone });
             const data = response.data.message;
             setPhoneMessage(data);
         } catch (error) {

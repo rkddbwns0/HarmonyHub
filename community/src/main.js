@@ -70,7 +70,7 @@ function Main() {
                                 <tbody className="main-tbody">
                                     {popular_hits.map((item, index) => (
                                         <tr className="main-tr" key={index}>
-                                            <td className="main-td">{item.category} 게시판</td>
+                                            <td className="main-td">{item.category}</td>
                                             <td
                                                 className="main-td"
                                                 onClick={() =>
@@ -110,7 +110,7 @@ function Main() {
                                 <tbody className="main-tbody">
                                     {popular_liked.map((item, index) => (
                                         <tr className="main-tr" key={index}>
-                                            <td className="main-td">{item.category} 게시판</td>
+                                            <td className="main-td">{item.category}</td>
                                             <td
                                                 className="main-td"
                                                 onClick={() =>

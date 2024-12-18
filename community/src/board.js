@@ -23,9 +23,11 @@ function Board() {
     const handleWritePost = () => {
         if (!user) {
             alert('로그인을 해주세요.');
-            navigate('/login', { state: { form: location.pathname, category_no: category_no } });
+            navigate('/login', { state: { form: location.pathname, category_no: category_no, category: category } });
         } else {
-            navigate('/writePost', { state: { form: location.pathname, category_no: category_no } });
+            navigate('/writePost', {
+                state: { form: location.pathname, category_no: category_no, category: category },
+            });
         }
     };
 
@@ -46,7 +48,7 @@ function Board() {
             </header>
             <div className="mainContainer">
                 <div>
-                    <strong>{category} 게시판</strong>
+                    <strong>{category}</strong>
                 </div>
                 <table className="boardTable">
                     <thead className="board-thead">

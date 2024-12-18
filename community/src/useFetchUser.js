@@ -9,7 +9,6 @@ const useFetchUser = () => {
         const loginUser = async () => {
             try {
                 const response = await axios.post(`${SERVER_ADDRESS}/userdb/user`, {}, { withCredentials: true });
-                console.log(response.data);
                 if (response.data) {
                     setUser(response.data);
                 }

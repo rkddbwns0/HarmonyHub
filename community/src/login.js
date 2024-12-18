@@ -9,6 +9,7 @@ function Login() {
     const path = location.state?.form || '/';
     const no = location.state?.no || '';
     const category_no = location.state?.category_no || '';
+    const category = location.state?.category || '';
     const [id, setId] = useState('');
     const [password, setPassword] = useState('');
 
@@ -24,6 +25,7 @@ function Login() {
                 const state = {};
                 if (no) state.no = no;
                 if (category_no) state.category_no = category_no;
+                if (category) state.category = category;
                 navigate(path, { state });
             }
         } catch (error) {

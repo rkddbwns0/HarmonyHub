@@ -85,7 +85,7 @@ router.post('/login', (req, res) => {
 router.post('/user', checkToken, async (req, res) => {
     const userId = req.user.id;
 
-    const query = 'SELECT id, name, nickname FROM userdb WHERE id = ?';
+    const query = 'SELECT * FROM userdb WHERE id = ?';
 
     db.query(query, [userId], (error, result) => {
         if (error) {
@@ -96,18 +96,18 @@ router.post('/user', checkToken, async (req, res) => {
     });
 });
 
-router.post('/logout', async (req, res) => {
-    const { id } = req.body;
+router.post('/logout', checkToken, async (req, res) => {
+    const userId = req.user.id;
     try {
         const query = 'SELECT * FROM userdb WHERE id = ?';
-        db.query(query, [id], (error, result) => {
+        db.query(query, [userId], (error, result) => {
             if (error) {
                 console.error(error);
             }
 
             if (result.length > 0) {
                 const updateToken = 'UPDATE userdb SET refresh_token = null WHERE id = ?';
-                db.query(updateToken, [result[0].id], (error, updateResult) => {
+                db.query(updateToken, [userId], (error, updateResult) => {
                     if (error) {
                         console.error(error);
                     }
@@ -121,6 +121,39 @@ router.post('/logout', async (req, res) => {
         });
     } catch (error) {
         console.error(error);
+    }
+});
+
+router.post('/modifyInfo', checkToken, (req, res) => {
+    const userId = req.user.id;
+    const { nickname, password } = req.body;
+
+    if (password) {
+        try {
+            const modifyPasswordQuery = `UPDATE userdb SET password = ? WHERE id = ?`;
+            db.query(modifyPasswordQuery, [password, userId], (error, result) => {
+                if (error) {
+                    console.error(error);
+                }
+
+                res.json({ success: true });
+            });
+        } catch (error) {
+            console.error(error);
+        }
+    } else if (nickname) {
+        try {
+            const modifyNicknameQuery = `UPDATE userdb SET nickname = ? WHERE id = ?`;
+            db.query(modifyNicknameQuery, [nickname, userId], (error, result) => {
+                if (error) {
+                    console.error(error);
+                }
+
+                res.json({ success: true });
+            });
+        } catch (error) {
+            console.error(error);
+        }
     }
 });
 

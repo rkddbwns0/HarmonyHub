@@ -4,12 +4,14 @@ import useFetchUser from './useFetchUser';
 import axios from 'axios';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { SERVER_ADDRESS } from './serverAddress/serverAddress';
+import './css/writePost.css';
 
 function WritePost() {
     const { user } = useFetchUser();
     const navigate = useNavigate();
     const location = useLocation();
     const category_no = location.state.category_no;
+    const category = location.state.category;
     const path = location.state.form;
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
@@ -30,7 +32,7 @@ function WritePost() {
 
                 if (response.data.success === true) {
                     alert('게시글이 작성되었습니다!');
-                    navigate(path, { state: { category_no: category_no } });
+                    navigate(path, { state: { category_no: category_no, category: category } });
                     return true;
                 }
             }
@@ -40,25 +42,33 @@ function WritePost() {
     };
 
     return (
-        <div style={{ display: 'flex', flex: 1 }}>
-            <header>
-                <Nav user={user} />
-            </header>
-
+        <div className="container">
             <div>
-                <div>
-                    <input
-                        placeholder="제목을 입력해 주세요."
-                        value={title}
-                        onChange={(e) => setTitle(e.target.value)}
-                    />
+                <Nav user={user} />
+            </div>
+
+            <div className="mainView">
+                <div className="topView">
+                    <div className="titleView">
+                        <input
+                            className="titleInput"
+                            placeholder="제목"
+                            value={title}
+                            onChange={(e) => setTitle(e.target.value)}
+                        />
+                    </div>
+                    <div className="categoryView">
+                        <p>카테고리</p>
+                        <p>{category}</p>
+                    </div>
                 </div>
-                <div>
+                <div className="writerView">
                     <p>작성자</p>
                     {user ? <p>{user[0]?.nickname}</p> : null}
                 </div>
                 <div>
                     <textarea
+                        className="contentInput"
                         maxLength={1000}
                         placeholder="내용을 입력해 주세요."
                         value={content}
