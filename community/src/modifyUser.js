@@ -1,15 +1,30 @@
 import { useNavigate } from 'react-router-dom';
 import useFetchUser from './useFetchUser';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import axios from 'axios';
 import { SERVER_ADDRESS } from './serverAddress/serverAddress';
 import Nav from './Nav';
+import './css/modifyUser.css';
 
 function ModifyUser() {
     const { user } = useFetchUser();
     const navigate = useNavigate();
     const [nickname, setNickname] = useState('');
     const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
+    const passwordRef = useRef(null);
+
+    const handleShowPassword = async () => {
+        const password = await passwordRef.current;
+        if (password === null) return;
+
+        await setShowPassword(!showPassword);
+        if (!showPassword) {
+            password.type = 'text';
+        } else {
+            password.type = 'password';
+        }
+    };
 
     const logout = async () => {
         try {
@@ -21,19 +36,19 @@ function ModifyUser() {
 
     const modifyInfo = async () => {
         try {
-            const response = await axios.post(`${SERVER_ADDRESS}/userdb/modifyInfo`, {
-                nickname: nickname || null,
-                password: password || null,
-            });
-            if (password && response.data.suceess === true) {
-                alert('비밀번호가 변경되었습니다. 다시 로그인을 진행해 주세요.');
-                logout();
-                navigate('/login');
-            } else if (nickname && response.data.status === true) {
-                console.log('닉네임이 변경되었습니다!');
-                navigate('/myPage');
-            } else {
-                console.log('에러인듯');
+            if (password === '' && user[0]?.nickname === nickname) {
+                alert('변경할 정보를 입력해 주세요.');
+            }
+            const response = await axios.post(
+                `${SERVER_ADDRESS}/userdb/modifyInfo`,
+                {
+                    nickname: nickname || null,
+                    password: password || null,
+                },
+                { withCredentials: true }
+            );
+            if (password) {
+                alert('비밀번호가 변경되었습니다.');
             }
         } catch (error) {
             console.error(error);
@@ -41,19 +56,60 @@ function ModifyUser() {
     };
 
     useEffect(() => {
-        console.log(user);
-    }, []);
+        if (user) {
+            setNickname(user[0]?.nickname);
+        }
+    }, [user]);
 
     return (
         <div>
             <div>
                 <Nav user={user} />
             </div>
-            <input />
-            <input />
-            <input />
-            <input />
-            <input />
+            <div style={{ alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
+                <h2>정보 수정</h2>
+            </div>
+            {user ? (
+                <div className="modifyContainer">
+                    <div className="infoSection">
+                        <h4 className="sectionTitle">아이디</h4>
+                        <input className="modifyInput" value={user[0]?.id} disabled={true} />
+                    </div>
+                    <div className="infoSection">
+                        <h4 className="sectionTitle">이름</h4>
+                        <input className="modifyInput" value={user[0]?.name} disabled={true} />
+                    </div>
+                    <div className="infoSection">
+                        <h4 className="sectionTitle">전화번호</h4>
+                        <input className="modifyInput" value={user[0]?.phone} disabled={true} />
+                    </div>
+                    <div className="infoSection">
+                        <h4 className="sectionTitle">닉네임</h4>
+                        <input
+                            className="modifyInput"
+                            value={nickname}
+                            onChange={(text) => setNickname(text.target.value)}
+                        />
+                    </div>
+                    <div className="infoSection">
+                        <h4 className="sectionTitle">비밀번호 재설정</h4>
+                        <input
+                            className="modifyInput"
+                            value={password}
+                            onChange={(text) => setPassword(text.target.value)}
+                            type="password"
+                            ref={passwordRef}
+                        />
+                        <div className="showPasswordView">
+                            <input type="checkbox" onChange={handleShowPassword} />
+                            <span>비밀번호 보기</span>
+                        </div>
+                    </div>
+                    <div className="modifyBtnView">
+                        <button onClick={modifyInfo}>수정하기</button>
+                    </div>
+                </div>
+            ) : null}
         </div>
     );
 }

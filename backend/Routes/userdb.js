@@ -126,30 +126,30 @@ router.post('/logout', checkToken, async (req, res) => {
 
 router.post('/modifyInfo', checkToken, (req, res) => {
     const userId = req.user.id;
-    const { nickname, password } = req.body;
+    const { password, nickname } = req.body;
 
-    if (password) {
-        try {
-            const modifyPasswordQuery = `UPDATE userdb SET password = ? WHERE id = ?`;
-            db.query(modifyPasswordQuery, [password, userId], (error, result) => {
-                if (error) {
-                    console.error(error);
-                }
+    if (password || nickname) {
+        const updates = [];
+        const values = [];
 
-                res.json({ success: true });
-            });
-        } catch (error) {
-            console.error(error);
+        if (password) {
+            updates.push('password = ?');
+            values.push(password);
         }
-    } else if (nickname) {
+
+        if (nickname) {
+            updates.push('nickname = ?');
+            values.push(nickname);
+        }
+
+        const query = `UPDATE userdb SET ${updates.join(', ')} WHERE id = ?`;
+        values.push(userId);
+
         try {
-            const modifyNicknameQuery = `UPDATE userdb SET nickname = ? WHERE id = ?`;
-            db.query(modifyNicknameQuery, [nickname, userId], (error, result) => {
+            db.query(query, values, (error, result) => {
                 if (error) {
                     console.error(error);
                 }
-
-                res.json({ success: true });
             });
         } catch (error) {
             console.error(error);

@@ -208,4 +208,55 @@ router.post('/myPosts', checkToken, (req, res) => {
     });
 });
 
+router.post('/update', checkToken, async (req, res) => {
+    const userId = req.user.id;
+    const no = req.body;
+    if (title || content) {
+        const updates = [];
+        const values = [];
+
+        if (title) {
+            updates.push('title = ?');
+            values.push(title);
+        }
+
+        if (content) {
+            updates.push(content);
+            values.push(content);
+        }
+
+        const updateQuery = `UPDATE postdb SET ${updates.join(', ')} = ? WHERE id = ? AND no = ?`;
+        values.push(userId);
+        values.push(no);
+
+        try {
+            db.query(updateQuery, [values], (error, result) => {
+                if (console.error) {
+                    console.error(error);
+                }
+            });
+        } catch (error) {
+            console.error(error);
+        }
+    }
+});
+
+router.post('/delete', checkToken, (req, res) => {
+    const userId = req.user.id;
+    const { no } = req.body;
+
+    const deleteQuery = `DELETE FROM postdb WHERE no = ? AND user_id = ?`;
+    try {
+        db.query(deleteQuery, [no, userId], (error, result) => {
+            if (error) {
+                console.error(error);
+            }
+
+            res.status(200).json({ success: true });
+        });
+    } catch (error) {
+        console.error(error);
+    }
+});
+
 module.exports = router;

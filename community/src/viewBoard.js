@@ -138,6 +138,30 @@ function ViewBoard() {
         setComments('');
     };
 
+    const handleDeletePost = async () => {
+        try {
+            const response = await axios.post(
+                `${SERVER_ADDRESS}/postdb/delete`,
+                { no: view.no },
+                { withCredentials: true }
+            );
+            if (response.status === 200) {
+                alert('게시글이 삭제되었습니다.');
+                navigate(-1);
+            }
+            return;
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const deleteAlert = () => {
+        const confirmed = window.confirm('게시글을 삭제하시겠습니까?');
+        if (confirmed) {
+            handleDeletePost();
+        }
+    };
+
     return (
         <div className="container">
             <div>
@@ -145,6 +169,12 @@ function ViewBoard() {
             </div>
             <div className="mainView">
                 <div>
+                    {user && user[0]?.id === view.user_id ? (
+                        <div>
+                            <a>수정</a>
+                            <a onClick={deleteAlert}>삭제</a>
+                        </div>
+                    ) : null}
                     <div>
                         <p>{view.title}</p>
                     </div>
